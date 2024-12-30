@@ -1,0 +1,52 @@
+---
+title: ".VHD Mounting"
+date: 2024-12-30 00:00:00 +000
+categories: [Hello World]
+tags: [Hello World]
+---
+
+# .VHD Mounting
+
+## What is vhd ?
+
+**VHD** (Virtual Hard Disk) is a **file** format which represents a virtual hard disk drive (HDD). It may contain what is found on a physical HDD, such as disk partitions and a **file** system, which in turn can contain **files** and folders. It is typically used as the hard disk of a virtual machine
+
+## How we can use it in Pentesting?
+
+Some Times you get vhd files on remote share but these very large files not a good idea to download it in our local system so in this case we can mount remote share.
+
+## Tools used
+
+> **apt-get install cifs-utils**
+>
+> **apt**-**get install libguestfs-tools**
+
+The in-kernel CIFS filesystem is generally the preferred method for mounting SMB/CIFS shares on Linux.
+
+The in-kernel CIFS filesystem relies on a set of user-space tools. That package of tools is called **cifs-utils**. Although not really part of Samba proper, these tools were originally part of the Samba package. For several reasons, shipping these tools as part of Samba was problematic and it was deemed better to split them off into their own package.
+
+**libguestfs is a set of tools for accessing and modifying virtual machine (VM) disk images**. You can use this for viewing and editing files inside guests, scripting changes to VMs, [monitoring disk used/free statistics](http://libguestfs.org/virt-df.1.html), [creating guests](http://libguestfs.org/virt-builder.1.html), P2V, [V2V](http://libguestfs.org/virt-v2v.1.html), performing backups, cloning VMs, building VMs, formatting disks, resizing disks, and much more.
+
+## Mounting the .vhd
+
+Lets assume out target i.p is **10.10.10.134** and share name is **root:**
+
+```
+mount -t cifs //1.03.0.31337/root -o user=guest,password= /mnt/root
+```
+
+We mount the share successfully but can’t read vhd files.
+
+Now let’s say there is a vhd file in root directory called **target.vhd.**
+
+```
+guestmount --add /mnt/root/target.vhd --inspector  --ro /mnt/vhd
+```
+
+Go to the /mnt/vhd and the disk is mounted:
+
+```
+┌──(root㉿kali)-[/mnt/vhd]
+└─# ls
+'$Recycle.Bin'  'Documents and Settings'   PerfLogs  'Program Files'   ProgramData   Recovery  'System Volume Information'   Users   Windows   autoexec.bat   config.sys   pagefile.sys
+```
